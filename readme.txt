@@ -27,4 +27,4 @@ python manage.py migrate
 
 7. Run the server
 
-gunicorn config.wsgi_production --bind 0.0.0.0:8000 --workers 1
+gunicorn config.wsgi --bind 0.0.0.0:8000 --workers 1
