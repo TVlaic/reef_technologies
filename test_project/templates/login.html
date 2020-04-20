@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+    <head>
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+        <!-- jQuery library -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+        <!-- Latest compiled JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+        <title>Login Page</title>
+    </head>
+
+    <body>
+
+      <div class="container">
+        <h2>Login</h2>
+        <form action="./login" method="post">
+          {% csrf_token %}
+          <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control" id="email" placeholder="Enter email" name="email" required>
+          </div>
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" class="form-control" id="pwd" placeholder="Enter password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </form>
+
+        <form action="./mock_login" method="get">
+          <div class="form-group">
+            </br>
+            <div class='row'>
+              <span>Mock login due to low rate limits for auth endpoint (10 per hour)</span>
+            </div>
+            <div class='row'>
+              <button type='submit' class="btn btn-default">Mock Login</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <script>
+        function showCookieFail(){
+            alert('You have to enable cookies for the site to work');
+        };
+        function checkCookie(){
+            var cookieEnabled=(navigator.cookieEnabled)? true : false   
+            if (typeof navigator.cookieEnabled=="undefined" && !cookieEnabled){ 
+                document.cookie="testcookie";
+                cookieEnabled=(document.cookie.indexOf("testcookie")!=-1)? true : false;
+            }
+            return (cookieEnabled)?true:showCookieFail();
+        };
+        window.onload = function() { checkCookie(); };
+      </script>
+</body>
