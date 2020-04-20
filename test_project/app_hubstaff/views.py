@@ -38,8 +38,10 @@ def login(request, **kwargs):
 
     response_json = services.login_hubstaff(email, password)
     if 'error' in response_json and 'Rate limit' in response_json['error']:
+        logger.error('Login error - %s' % response_json)
         return HttpResponse('<h1>Rate limit reached for API requests</h1>')
     elif 'error' in response_json or 'user' not in response_json:
+        logger.error('Login error - %s' % response_json)
         return HttpResponse('<h1>Unable to authenticate with the given credentials</h1>')
     
     # hardcoding due to rate limit
@@ -61,11 +63,13 @@ def timesheet_report(request, **kwargs):
     start_date = datetime.strptime(start_date, '%Y-%m-%d')
     end_date = datetime.strptime(end_date, '%Y-%m-%d')
     if start_date > end_date:
+        logger.error('Timesheet error - %s' % response_json)
         return HttpResponse('<h1>Start Date needs to be before End Date</h1>')
 
 
     successful, error_message, calculated_report = timesheet.calculate_timesheet_report(user_auth_token, start_date, end_date)
     if not successful:
+        logger.error('Timesheet error - %s' % error_message)
         return HttpResponse('<h1>%s</h1>' % error_message)
 
     start_date = start_date.strftime('%Y-%m-%dT00:00:00Z')

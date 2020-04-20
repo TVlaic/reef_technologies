@@ -1,8 +1,11 @@
 from django.conf import settings
 import pandas as pd
 import numpy as np
+import logging
 
 from app_hubstaff import services
+
+logger = logging.getLogger("%s.%s" % ("hubstaff", __name__))
 
 def calculate_timesheet_report(user_auth_token, start_date, end_date):
     successful = True
@@ -13,6 +16,7 @@ def calculate_timesheet_report(user_auth_token, start_date, end_date):
     if 'organizations' not in organisations:
         successful = False
         error_message = 'Error fetching organisations please try again'
+        logger.error('Timesheet error, organization fetch - %s' % organizations)
         return successful, error_message, None
     
 
@@ -26,24 +30,28 @@ def calculate_timesheet_report(user_auth_token, start_date, end_date):
     if my_org_data is None:
         successful = False
         error_message = 'You are not a member of %s organisation' % my_org_name
+        logger.error('Timesheet error, no "my_org_daya" - %s' % organizations)
         return successful, error_message, None
     
     my_org_projects = services.fetch_target_organisation_projects(user_auth_token, int(my_org_data['id']))
     if 'error' in my_org_projects:
         successful = False
         error_message = 'Error fetching projects for organisation'
+        logger.error('Timesheet error, projects fetch - %s' % my_org_projects)
         return successful, error_message, None
 
     my_org_members = services.fetch_target_organisation_members(user_auth_token, int(my_org_data['id']))
     if 'error' in my_org_members:
         successful = False
         error_message = 'Error fetching members for organisation'
+        logger.error('Timesheet error, members fetch - %s' % my_org_members)
         return successful, error_message, None
 
     my_org_activities = services.fetch_target_organisation_activities(user_auth_token, int(my_org_data['id']), start_date, end_date)
     if 'error' in my_org_activities:
         successful = False
         error_message = 'Error fetching activities for organisation'
+        logger.error('Timesheet error, activities fetch - %s' % my_org_activities)
         if my_org_activities['error'] == 'Date range can not be more than 7 days':
             error_message += " - date range can't be more than 7 days"
         return successful, error_message, None
@@ -65,7 +73,8 @@ def calculate_timesheet_report(user_auth_token, start_date, end_date):
                         columns=['user'], aggfunc=np.sum).reset_index()
         calculated_report.iloc[:, 1:] = round(calculated_report.iloc[:, 1:],2).astype(str)
         calculated_report.iloc[:, 1:] = calculated_report.iloc[:, 1:] + 'h'
-    except:
+    except Exception:
+        logger.exception('Timesheet error, pandas error occured')
         calculated_report = pd.DataFrame(['-'], columns=['Projects'])
 
     return successful, error_message, calculated_report
