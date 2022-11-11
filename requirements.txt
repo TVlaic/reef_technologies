@@ -7,7 +7,7 @@ gunicorn==20.0.4
 idna==2.9
 numpy==1.18.3
 pandas==1.0.3
-pyspark==2.4.4
+pyspark==3.2.2
 python-dateutil==2.8.1
 pytz==2019.3
 requests==2.23.0
